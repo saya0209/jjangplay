@@ -57,18 +57,19 @@ public class BoardReplyController {
 					// jsp 정보앞에 "redirect:" 가 붙어있으면 redirect로 처리
 					// 없으면 forword
 					jsp = "redirect:/board/view.do?no="+pageObject.getNo()+"&inc=0&"+pageObject.getPageObject().getPageQuery()+"&"+pageObject.getPageQuery();
+					session.setAttribute("msg", "댓글이 등록되었습니다");
 					break;
-				case "/board/update.do":
-					System.out.println("4. 일반게시판 글수정 처리");
+				case "/boardreply/update.do":
+					System.out.println("4. 일반게시판 댓글 수정 처리");
 					
 					// updateForm 적은 데이터를 가져온다. (DB에 저장하기 위해)
-					no = Long.parseLong(request.getParameter("no"));
+					Long rno = Long.parseLong(request.getParameter("rno"));
 					content = request.getParameter("content");
 					writer = request.getParameter("writer");
 					pw = request.getParameter("pw");
 					
 					vo = new BoardReplyVO();
-					vo.setNo(no);
+					vo.setRno(rno);
 					vo.setContent(content);
 					vo.setWriter(writer);
 					vo.setPw(pw);
@@ -76,33 +77,28 @@ public class BoardReplyController {
 					
 					Execute.execute(Init.get(uri), vo);
 					
-					jsp="redirect:view.do?no="+no+"&inc=0";
+					jsp = "redirect:/board/view.do?no="+pageObject.getNo()+"&inc=0&"+pageObject.getPageObject().getPageQuery()+"&"+pageObject.getPageQuery();
+
+					session.setAttribute("msg", "댓글이 수정되었습니다");
 					break;
-				case "/board/delete.do":
-					System.out.println("5. 일반게시판 글삭제");
+				case "/boardreply/delete.do":
+					System.out.println("5. 일반게시판 댓글삭제");
 					// 데이터 수집 : 삭제할 글번호, 확인용 비밀번호
 					vo = new BoardReplyVO();
 					
-					vo.setNo(Long.parseLong(request.getParameter("no")));
+					vo.setRno(Long.parseLong(request.getParameter("rno")));
 					vo.setPw(request.getParameter("pw"));
 					
 					// DB처리
 					result =Execute.execute(Init.get(uri), vo);
 					
 					// 결과표시
-					if ((Integer) result == 1) {
-						System.out.println();
-						System.out.println("***********************");
-						System.out.println("** " + vo.getNo() + "번 글이 삭제되었습니다.");
-						System.out.println("***********************");
-					}
-					else {
-						System.out.println();
-						System.out.println("########################");
-						System.out.println("## " + vo.getNo() + "번 글이 삭제되지 않았습니다.");
-						System.out.println("########################");
-					}
-					jsp = "redirect:list.do";
+					session.setAttribute("msg", "댓글이 삭제되었습니다");
+
+					
+//					jsp = "redirect:list.do";
+					jsp = "redirect:/board/view.do?no="+pageObject.getNo()+"&inc=0&"+pageObject.getPageObject().getPageQuery()+"&"+pageObject.getPageQuery();
+
 					break;
 
 				default:

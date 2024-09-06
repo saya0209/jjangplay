@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.jjangplay.board.controller.BoardController;
 import com.jjangplay.boardreply.controller.BoardReplyController;
+import com.jjangplay.image.controller.ImageController;
 import com.jjangplay.member.controller.MemberController;
 import com.jjangplay.notice.controller.NoticeController;
 
@@ -33,6 +34,7 @@ public class DispatcherServlet extends HttpServlet {
 	
 	// Controller 선언과 생성 - 1번만 처리된다.
 	private BoardController boardController= new BoardController();
+	private ImageController imageController= new ImageController();
 	private NoticeController noticeController= new NoticeController();
 	private MemberController memberController= new MemberController();
 	private BoardReplyController boardReplyController= new BoardReplyController();
@@ -98,6 +100,9 @@ public class DispatcherServlet extends HttpServlet {
 		case "/member":
 			System.out.println("===회원 관리===");
 			jsp = memberController.execute(request);
+		case "/image":
+			System.out.println("===이미지 게시판===");
+			jsp = imageController.execute(request);
 			
 		}
 		

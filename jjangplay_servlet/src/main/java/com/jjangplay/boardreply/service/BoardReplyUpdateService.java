@@ -1,7 +1,7 @@
 package com.jjangplay.boardreply.service;
 
-import com.jjangplay.board.vo.BoardVO;
 import com.jjangplay.boardreply.dao.BoardReplyDAO;
+import com.jjangplay.boardreply.vo.BoardReplyVO;
 import com.jjangplay.main.dao.DAO;
 import com.jjangplay.main.service.Service;
 
@@ -16,8 +16,8 @@ private BoardReplyDAO dao;
 	
 	@Override
 	public Integer service(Object obj) throws Exception {
-		// [BoardController] -> (Execute) -> BoardUpdateService -> [BoardDAO.update()]
-		return dao.update((BoardVO)obj);
+		// [BoardReplyController] -> (Execute) -> BoardReplyUpdateService -> [BoardReplyDAO.update()]
+		return dao.update((BoardReplyVO)obj);
 	}
 
 }

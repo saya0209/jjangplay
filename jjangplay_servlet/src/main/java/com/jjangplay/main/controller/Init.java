@@ -13,8 +13,13 @@ import com.jjangplay.boardreply.dao.BoardReplyDAO;
 import com.jjangplay.boardreply.service.BoardReplyDeleteService;
 import com.jjangplay.boardreply.service.BoardReplyListService;
 import com.jjangplay.boardreply.service.BoardReplyUpdateService;
-import com.jjangplay.boardreply.service.BoardReplyViewService;
 import com.jjangplay.boardreply.service.BoardReplyWriteService;
+import com.jjangplay.image.dao.ImageDAO;
+import com.jjangplay.image.service.ImageDeleteService;
+import com.jjangplay.image.service.ImageListService;
+import com.jjangplay.image.service.ImageUpdateService;
+import com.jjangplay.image.service.ImageViewService;
+import com.jjangplay.image.service.ImageWriteService;
 import com.jjangplay.main.dao.DAO;
 import com.jjangplay.main.service.Service;
 import com.jjangplay.member.dao.MemberDAO;
@@ -44,6 +49,7 @@ public class Init {
 	static {
 		// dao 생성
 		daoMap.put("boardDAO", new BoardDAO());		// 일반게시판
+		daoMap.put("imageDAO", new ImageDAO());		// 이미지게시판
 		daoMap.put("noticeDAO", new NoticeDAO());	// 공지사항
 		daoMap.put("memberDAO", new MemberDAO());	// 회원관리
 		daoMap.put("boardReplyDAO", new BoardReplyDAO());	// 일반게시판 댓글
@@ -78,13 +84,11 @@ public class Init {
 		
 		// 1-1. 일반게시판 댓글
 		serviceMap.put("/boardreply/list.do", new BoardReplyListService());
-		serviceMap.put("/boardreply/view.do", new BoardReplyViewService());
 		serviceMap.put("/boardreply/write.do", new BoardReplyWriteService());
 		serviceMap.put("/boardreply/update.do", new BoardReplyUpdateService());
 		serviceMap.put("/boardreply/delete.do", new BoardReplyDeleteService());
 		// 조립 dao -> service
 		serviceMap.get("/boardreply/list.do").setDAO(daoMap.get("boardReplyDAO"));
-		serviceMap.get("/boardreply/view.do").setDAO(daoMap.get("boardReplyDAO"));
 		serviceMap.get("/boardreply/write.do").setDAO(daoMap.get("boardReplyDAO"));
 		serviceMap.get("/boardreply/update.do").setDAO(daoMap.get("boardReplyDAO"));
 		serviceMap.get("/boardreply/delete.do").setDAO(daoMap.get("boardReplyDAO"));
@@ -108,6 +112,20 @@ public class Init {
 		serviceMap.get("/member/delete.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/conUpdate.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/updateAdmin.do").setDAO(daoMap.get("memberDAO"));
+
+		// 1. 일반게시판 service 생성
+		serviceMap.put("/image/list.do", new ImageListService());
+		serviceMap.put("/image/view.do", new ImageViewService());
+		serviceMap.put("/image/write.do", new ImageWriteService());
+		serviceMap.put("/image/update.do", new ImageUpdateService());
+		serviceMap.put("/image/delete.do", new ImageDeleteService());
+		
+		// 조립 dao -> service
+		serviceMap.get("/image/list.do").setDAO(daoMap.get("imageDAO"));
+		serviceMap.get("/image/view.do").setDAO(daoMap.get("boardDAO"));
+		serviceMap.get("/image/write.do").setDAO(daoMap.get("imageDAO"));
+		serviceMap.get("/image/update.do").setDAO(daoMap.get("boardDAO"));
+		serviceMap.get("/image/delete.do").setDAO(daoMap.get("boardDAO"));
 	}
 	
 	public static Service get(String uri) {

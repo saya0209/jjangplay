@@ -9,6 +9,7 @@
 		<pattern>/main/*</pattern>
 		<pattern>/board/*</pattern>
 		<pattern>/notice/*</pattern>
+		<pattern>/image/*</pattern>
 		<pattern>/info/*</pattern>
 		<pattern>/member/*</pattern>
 		<pattern>/reserve/*</pattern>
