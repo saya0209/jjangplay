@@ -8,7 +8,6 @@
     <meta charset="UTF-8">
     <title>일반 게시판 리스트</title>
     
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
         $(function(){
             console.log("jQuery loaded...");

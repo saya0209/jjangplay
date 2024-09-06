@@ -1,11 +1,10 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>일반 게시판 글보기</title>
-
 <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <!-- FontAwesome CSS -->
@@ -43,29 +42,30 @@
     color: white;
   }
 </style>
-
-<!-- Custom JS -->
+<!-- 2.라이브러리 확인 -->
 <script type="text/javascript">
+// jquery: $(ducument).ready(function(){~~~});
+// 페이지가 로딩완료 후 세팅이 진행된다.
 $(function(){
-  console.log("jQuery loading......");
-
-  $("#deleteBtn").click(function(){
-    console.log("deleteBtn event......");
-    $("#pw").val("");
-    $("#deleteModal").modal("show");
-  });
-
-  $("#deleteCancelBtn").click(function(){
-    console.log("deleteCancelBtn event......");
-    $("#pw").val("");
-    $("#deleteModal").modal("hide");
-  });
+	console.log("jquery loading......");
+	
+	$("#deleteBtn").click(function(){
+		console.log("deleteBtn event......");
+		// 비밀번호 입력창 clear
+		$("#pw").val("");
+		$("#deleteModal").modal("show");
+	});
+	
+	$("#deleteCancelBtn").click(function(){
+		console.log("deleteCancelBtn event......");
+		$("#pw").val("");
+		$("#deleteModal").modal("hide");
+	});
 });
 </script>
-
 </head>
 <body>
-
+글번호 : ${param.no }, 조회수 증가 : ${param.inc }<br>
 <div class="container">
   <h1 class="mb-4"><i class="fas fa-file-alt"></i> 일반 게시판 글보기</h1>
 
@@ -103,32 +103,47 @@ $(function(){
       <a href="list.do" class="btn btn-success btn-custom">리스트</a>
     </div>
   </div>
-</div>
-
-<!-- 삭제 확인 모달 -->
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="deleteModalLabel">비밀번호 확인</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form action="delete.do" method="post" id="deleteForm">
-          <input type="hidden" name="no" value="${param.no }">
-          <div class="form-group">
-            <label for="pw">본인 확인용 비밀번호</label>
-            <input type="password" name="pw" id="pw" class="form-control" required maxlength="20" pattern="^.{3,20}$" title="3~20자 입력 가능" placeholder="비밀번호 입력">
-          </div>
-          <button type="submit" class="btn btn-danger">삭제</button>
-          <button type="button" class="btn btn-secondary" id="deleteCancelBtn">취소</button>
-        </form>
+   
+  
+  <!-- The Modal -->
+  <div class="modal fade" id="deleteModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">비밀번호 확인</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+			<!-- 삭제시 비밀번호 입력을 위한 form태그 사용 -->
+			<form action="delete.do" method="post" id="deleteForm">
+				<!-- type="hidden"은 form태그에 보이지는 않지만
+				값을 같이 넘겨야 할때 사용합니다.
+				값을 넘길때 가장중요한 프로퍼티는 name 이다. -->
+				<input type="hidden" name="no" value="${param.no }">
+				<!-- required : 반드시 작성되어야 한다는 의미 -->
+				<!-- pattern ^로 시작해서 $로 끝난다. -->
+				<!-- .은 \n 빼로 전부 다 사용가능 -->
+				<!-- pw는 3자에서 20자 이내로 써야한다. -->
+				<!-- title의 내용은 툴팁으로 모여준다. -->
+				<input name="pw" required maxlength="20"
+					pattern="^.{3,20}$"
+					title="3~20자 입력 가능"
+					placeHolder="본인 확인용 비밀번호">
+				<button  class="btn btn-danger">삭제</button>
+				<button type="button" class="btn btn-success"
+					id="deleteCancelBtn">취소</button>
+			</form>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
+   <!-- 댓글처리시작 -->
+   <jsp:include page="reply.jsp"></jsp:include>
+   <!-- 댓글처리끝 -->
+</div> <!-- end of class="container" -->
 </body>
 </html>

@@ -94,6 +94,18 @@ public class MemberController {
 //						// 여기서 -> Execute -> MemberConUpdateService -> MemberDAO().conUpdate(id)
 //						Execute.execute(new MemberConUpdateService(), Main.login.getId());
 //					}
+					session.setAttribute("msg", "로그인 처리가 되었습니다");
+					jsp = "redirect:/board/list.do";
+					break;
+			
+				case "/member/logout.do":
+					System.out.println("---로그아웃 처리---");
+					// session의 login 정보 지우기 -> 로그아웃처리
+					session.removeAttribute("login");
+					
+					session.setAttribute("msg", "로그아웃 처리가 되었습니다");
+
+					// 임시경로
 					jsp = "redirect:/board/list.do";
 					break;
 					

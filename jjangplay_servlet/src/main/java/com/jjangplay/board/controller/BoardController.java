@@ -6,6 +6,7 @@ import com.jjangplay.board.vo.BoardVO;
 import com.jjangplay.main.controller.Init;
 import com.jjangplay.util.exe.Execute;
 import com.jjangplay.util.page.PageObject;
+import com.jjangplay.util.page.ReplyPageObject;
 
 // Board(일반게시판) 의 메뉴를 선택하고, 데이터 수집(기능별), 예외처리
 public class BoardController {
@@ -60,6 +61,14 @@ public class BoardController {
 							new Long[]{no, inc});
 					// DB에서 가져온 데이터를 답는다.
 					request.setAttribute("vo", result);
+					
+					// 댓글 페이지 객체
+					// 데이터 전달 - page, perPageNum, no, replyPage, replyPerPageNum
+					ReplyPageObject replyPageObject = ReplyPageObject.getInstance(request);
+					// 가져온 데이터를 request에 담는다
+					request.setAttribute("replyList", 
+					Execute.execute(Init.get("/boardreply/list.do"), replyPageObject)
+					);
 					// DispatcherServlet에서 "/WEB-INF/views/board/view.jsp" 경로를 만들어서 forword한다.
 					jsp="board/view";
 					

@@ -9,6 +9,12 @@ import com.jjangplay.board.service.BoardListService;
 import com.jjangplay.board.service.BoardUpdateService;
 import com.jjangplay.board.service.BoardViewService;
 import com.jjangplay.board.service.BoardWriteService;
+import com.jjangplay.boardreply.dao.BoardReplyDAO;
+import com.jjangplay.boardreply.service.BoardReplyDeleteService;
+import com.jjangplay.boardreply.service.BoardReplyListService;
+import com.jjangplay.boardreply.service.BoardReplyUpdateService;
+import com.jjangplay.boardreply.service.BoardReplyViewService;
+import com.jjangplay.boardreply.service.BoardReplyWriteService;
 import com.jjangplay.main.dao.DAO;
 import com.jjangplay.main.service.Service;
 import com.jjangplay.member.dao.MemberDAO;
@@ -37,9 +43,10 @@ public class Init {
 	// static 메서드에서 초기화 해준다. (1번만 실행됨)
 	static {
 		// dao 생성
-		daoMap.put("boardDAO", new BoardDAO());
-		daoMap.put("noticeDAO", new NoticeDAO());
-		daoMap.put("memberDAO", new MemberDAO());
+		daoMap.put("boardDAO", new BoardDAO());		// 일반게시판
+		daoMap.put("noticeDAO", new NoticeDAO());	// 공지사항
+		daoMap.put("memberDAO", new MemberDAO());	// 회원관리
+		daoMap.put("boardReplyDAO", new BoardReplyDAO());	// 일반게시판 댓글
 
 		// 1. 일반게시판 service 생성
 		serviceMap.put("/board/list.do", new BoardListService());
@@ -68,6 +75,19 @@ public class Init {
 		serviceMap.get("/notice/write.do").setDAO(daoMap.get("noticeDAO"));
 		serviceMap.get("/notice/update.do").setDAO(daoMap.get("noticeDAO"));
 		serviceMap.get("/notice/delete.do").setDAO(daoMap.get("noticeDAO"));
+		
+		// 1-1. 일반게시판 댓글
+		serviceMap.put("/boardreply/list.do", new BoardReplyListService());
+		serviceMap.put("/boardreply/view.do", new BoardReplyViewService());
+		serviceMap.put("/boardreply/write.do", new BoardReplyWriteService());
+		serviceMap.put("/boardreply/update.do", new BoardReplyUpdateService());
+		serviceMap.put("/boardreply/delete.do", new BoardReplyDeleteService());
+		// 조립 dao -> service
+		serviceMap.get("/boardreply/list.do").setDAO(daoMap.get("boardReplyDAO"));
+		serviceMap.get("/boardreply/view.do").setDAO(daoMap.get("boardReplyDAO"));
+		serviceMap.get("/boardreply/write.do").setDAO(daoMap.get("boardReplyDAO"));
+		serviceMap.get("/boardreply/update.do").setDAO(daoMap.get("boardReplyDAO"));
+		serviceMap.get("/boardreply/delete.do").setDAO(daoMap.get("boardReplyDAO"));
 
 		// 2. 회원관리 service 생성
 		serviceMap.put("/member/login.do", new MemberLoginService());
