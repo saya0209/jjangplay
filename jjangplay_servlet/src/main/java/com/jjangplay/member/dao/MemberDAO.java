@@ -397,6 +397,82 @@ public class MemberDAO extends DAO {
 		return result;
 	}
 	
+	// 8. 회원등급 변경
+	public int changeGradeNo(MemberVO vo) throws Exception {
+		// 결과 저장 변수
+		int result = 0;
+		
+		try {
+			// 1.드라이버확인
+			// 2.DB연결
+			con = DB.getConnection();
+			// 3.SQL (UPDATE_ADMIN)
+			// 4.실행객체에 데이터세팅
+			pstmt = con.prepareStatement(CHANGEGRADENO);
+			pstmt.setInt(1, vo.getGradeNo());
+			pstmt.setString(2, vo.getId());
+			// 5.실행
+			result = pstmt.executeUpdate();
+			// 6.결과확인
+			if (result == 0) {
+				throw new Exception("예외발생 : 아이디가 맞지 않습니다.");
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			if (e.getMessage().indexOf("예외발생")>=0) {
+				throw e;
+			}
+			else {
+				throw new Exception("예외발생 : 회원등급 DB처리 중 예외발생");
+			}
+		} finally {
+			// 7.DB닫기
+			DB.close(con, pstmt);
+		}
+		
+		// 결과 리턴
+		return result;
+	}
+	
+	// 9. 회원상태 변경
+	public int changeStatus(MemberVO vo) throws Exception {
+		// 결과 저장 변수
+		int result = 0;
+		
+		try {
+			// 1.드라이버확인
+			// 2.DB연결
+			con = DB.getConnection();
+			// 3.SQL (UPDATE_ADMIN)
+			// 4.실행객체에 데이터세팅
+			pstmt = con.prepareStatement(CHANGESTATUS);
+			pstmt.setString(1, vo.getStatus());
+			pstmt.setString(2, vo.getId());
+			// 5.실행
+			result = pstmt.executeUpdate();
+			// 6.결과확인
+			if (result == 0) {
+				throw new Exception("예외발생 : 아이디가 맞지 않습니다.");
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			if (e.getMessage().indexOf("예외발생")>=0) {
+				throw e;
+			}
+			else {
+				throw new Exception("예외발생 : 회원상태 DB처리 중 예외발생");
+			}
+		} finally {
+			// 7.DB닫기
+			DB.close(con, pstmt);
+		}
+		
+		// 결과 리턴
+		return result;
+	}
+	
 	final String LIST = ""
 			+ " select id, name, birth, tel, gradeNo, "
 			+ " gradeName, status, photo from "
@@ -422,34 +498,24 @@ public class MemberDAO extends DAO {
 			+ " from member m, grade g "
 			+ " where (id = ?) and (m.gradeNo = g.gradeNo)";
 	
-	final String WRITE = "insert into member "
-			+ " (id, pw, name, gender, birth, tel, email, photo) "
-			+ " values (?, ?, ?, ?, ?, ?, ?, ?)";
+	final String WRITE = "insert into member (id, pw, name, gender, birth, tel, email, photo) values (?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	final String CHECKID = "select id from member where id=?";
 	
-	final String UPDATE = "update member "
-			+ " set name = ?, gender = ?, birth = ?, "
-			+ " tel = ?, email = ?, photo = ? "
-			+ " where id = ? and pw = ?";
+	final String UPDATE = "update member set name = ?, gender = ?, birth = ?, "
+			+ " tel = ?, email = ?, photo = ? where id = ? and pw = ?";
 	
-	final String DELETE = "update member "
-			+ " set status='탈퇴' "
-			+ " where id = ? and pw = ?";
+	final String DELETE = "update member set status='탈퇴' where id = ? and pw = ?";
 	
-	final String LOGIN = "select m.id, m.pw, m.name, m.gradeNo, "
-			+ " g.gradeName, m.photo, m.newMsgCnt "
-			+ " from member m, grade g "
-			+ " where (id = ? and pw = ? and status = '정상') "
-			+ " and (g.gradeNo = m.gradeNo)";
+	final String LOGIN = "select m.id, m.pw, m.name, m.gradeNo, g.gradeName, m.photo, m.newMsgCnt from member m, grade g where (id = ? and pw = ? and status = '정상') and (g.gradeNo = m.gradeNo)";
 	
-	final String UPDATE_CONDATE = "update member "
-			+ " set conDate = sysDate where id = ?";
+	final String UPDATE_CONDATE = "update member set conDate = sysDate where id = ?";
 	
-	final String UPDATE_ADMIN = "update member "
-			+ " set gradeNo = ?, status = ? "
-			+ " where id = ?";
+	final String UPDATE_ADMIN = "update member set gradeNo = ?, status = ? where id = ?";
 	
+	final String CHANGEGRADENO = "update member set gradeNo = ? where id = ?";
+	
+	final String CHANGESTATUS = "update member set status = ? where id = ?";
 	
 	
 	

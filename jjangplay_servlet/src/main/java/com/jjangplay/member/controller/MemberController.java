@@ -1,23 +1,15 @@
 package com.jjangplay.member.controller;
 
-import java.awt.Label;
 import java.io.File;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.swing.plaf.synth.SynthOptionPaneUI;
 
 import com.jjangplay.main.controller.Init;
 import com.jjangplay.main.controller.Main;
-import com.jjangplay.member.service.MemberConUpdateService;
 import com.jjangplay.member.service.MemberDeleteService;
-import com.jjangplay.member.service.MemberListService;
-import com.jjangplay.member.service.MemberLoginService;
-import com.jjangplay.member.service.MemberUpdateAdminService;
 import com.jjangplay.member.service.MemberUpdateService;
 import com.jjangplay.member.service.MemberViewService;
-import com.jjangplay.member.service.MemberWriteService;
 import com.jjangplay.member.vo.LoginVO;
 import com.jjangplay.member.vo.MemberVO;
 import com.jjangplay.util.exe.Execute;
@@ -110,7 +102,7 @@ public class MemberController {
 					
 					// 원래는 main page로 가야하나 구현 전이어서
 					// 일반게시판 list로 이동합니다. 
-					jsp = "redirect:/board/list.do";
+					jsp = "redirect:/main/main.do";
 					break;
 				case "/member/logout.do":
 					System.out.println("---로그아웃 처리---");
@@ -120,7 +112,7 @@ public class MemberController {
 					session.setAttribute("msg", "로그아웃 되었습니다.");
 					
 					// 임시 이동 경로
-					jsp = "redirect:/board/list.do";
+					jsp = "redirect:/main/main.do";
 					break;
 				case "/member/list.do":
 					System.out.println("1.회원 리스트");
@@ -137,24 +129,25 @@ public class MemberController {
 
 					jsp = "member/list";
 					break;
-				case "2":
-					System.out.println("2.내 정보 보기");
-					// Login인 되어있는지 확인
-					if (Main.login == null) throw new Exception("예외발생 : 로그인이 필요합니다.");
-					// 내 정보를 보기위해 데이터를 가져옵니다.
-					// 아이디, 패스워드, 이름, 성별, 생일, 연락처, 이메일, 가입일, 최근접속일, 사진,
-					// 등급번호, 등급이름
-					// 일반회원 : 자신의 것만
-					// 관리자는 : 선택할 수 있도록
-					id = (Main.login.getGradeNo() == 9)?In.getStr("아이디"):Main.login.getId();
+				case "/member/view.do":
+					System.out.println("2.내 정보 또는 회원정보 보기");
 					
+					// 로그인이 되어있어야 이곳으로 넘어옵니다.
+					// 상단에 정보보기를 통해 들어오면 request에 담겨있는 값이 없다. 이때는 session에서 id를 가져와 처리한다.
+					// 관리자가 회원정보리스트에서 클릭해서 들어올때는 request에 id 값이 있어서 request에 담긴 id값으로 처리한다.
+					
+					id= request.getParameter("id");
+					if(id==null) {
+						id=login.getId();
+					}
+										
 					// id를 가지고 DB에서 데이터 가져옵니다.
 					// 여기서(MemberController)->Execute->MemberViewService->MemberDAO.view()
-					result = Execute.execute(new MemberViewService(), id);
+					result = Execute.execute(Init.get(uri), id);
 					
-					// 가져온 데이터를 출력
-					new MemberPrint().print((MemberVO)result);
+					request.setAttribute("vo", result);
 					
+					jsp = "member/view";					
 					break;
 				case "/member/writeForm.do":
 					System.out.println("3-1.회원가입 폼");
@@ -196,9 +189,9 @@ public class MemberController {
 					session.setAttribute("msg", "회원가입이 완료되었습니다.");
 					// 원래는 main으로 가야하나 임시로
 					// /board/list.do로 이동한다.
-					jsp="redirect:/board/list.do";
+					jsp="redirect:/main/main.do";
 					break;
-				case "4":
+				case "member/update.do":
 					System.out.println("4.내 정보 수정");
 					// 가장먼저 login 되어있는지 확인
 					if (Main.login == null) throw new Exception("예외발생 : 로그인이 필요합니다.");
@@ -210,7 +203,7 @@ public class MemberController {
 					// 정보수정과 DB처리 메서드를 이용
 					update(vo);
 					break;
-				case "5":
+				case "member/delete.do":
 					System.out.println("5.회원탈퇴");
 					// 회원상태를 "탈퇴" 로 변경
 					if (Main.login == null) {
@@ -242,74 +235,63 @@ public class MemberController {
 						System.out.println("******************************");
 					}
 					break;
-				case "6":
-					System.out.println("6.로그인 or 로그아웃");
-					if (Main.login == null) {
-						// 로그인을 위한 데이터 수집 (id, pw)
-						id = In.getStr("아이디");
-						pw = In.getStr("비밀번호");
-						loginVO = new LoginVO();
-						loginVO.setId(id);
-						loginVO.setPw(pw);
-						
-						// DB처리
-						// 여기(MemberController)에서 -> Execute
-						// -> MemberLoginService -> MemberDAO().login()
-						Main.login =
-							(LoginVO) Execute.execute(new MemberLoginService(), loginVO);
-						
-						if (Main.login != null) {
-							System.out.println();
-							System.out.println("**************************");
-							System.out.println("** 로그인 되었습니다.       **");
-							System.out.println("**************************");
-							
-							// 최근 접속일 변경
-							// 여기서 -> Execute -> MemberConUpdateService -> MemberDAO().conUpdate(id)
-							Execute.execute(new MemberConUpdateService(), Main.login.getId());
-						}
-					}
-					else {
-						Main.login = null;
-						System.out.println();
-						System.out.println("**************************");
-						System.out.println("** 로그아웃 되었습니다.     **");
-						System.out.println("**************************");
-					} // end of if~else
-					break;
-				case "7":
-					// 권한을 확인
-					if (Main.login.getGradeNo() != 9) {
-						throw new Exception("예외발생 : 처리할 권한이 없습니다.");
-					}
+				case "/member/changeGradeNo.do":
+					System.out.println("회원등급 수정 처리");
 					
-					// 회원정보를 가져옴
-					id = In.getStr("아이디");
-					vo = (MemberVO) Execute.execute(new MemberViewService(), id);
+					// 데이터 수집 (사용자(Form) -> server(request) -> DB)
+					id = request.getParameter("id");
+					Integer gradeNo = Integer.parseInt(request.getParameter("gradeNo"));
 					
-					// 회원등급 및 상태수정을 위한 메서드
-					update_admin(vo);
+					// vo에 저장
+					vo = new MemberVO();
+					vo.setId(id);
+					vo.setGradeNo(gradeNo);
+					
+					// DB처리 MemberChangeGradeNoService -> MemberDAO.changeGradeNo()
+					Execute.execute(Init.get(uri), vo);
+					
+					// 페이지 정보 받기 & uri 에 붙이기
+					pageObject = PageObject.getInstance(request);
+					// 메세지
+					session.setAttribute("msg", "회원 ["+id+"] 등급이 "+((gradeNo==1)?"일반회원으로":"관리자로")+"변경되었습니다.");
+					
+					// 페이지 이동 (회원리스트)
+					jsp="redirect:list.do?"+pageObject.getPageQuery();
+					
 					break;
-
+				case "/member/changeStatus.do":
+					System.out.println("회원 상태 처리");
+					
+					// 데이터 수집 (사용자(Form) -> server(request) -> DB)
+					id = request.getParameter("id");
+					String status = request.getParameter("status");
+					
+					// vo에 저장
+					vo = new MemberVO();
+					vo.setId(id);
+					vo.setStatus(status);
+					
+					// DB처리 MemberChangeStatusService -> MemberDAO.changeStatus()
+					Execute.execute(Init.get(uri), vo);
+					
+					// 페이지 정보 받기 & uri 에 붙이기
+					pageObject = PageObject.getInstance(request);
+					// 메세지
+					session.setAttribute("msg", "회원 ["+id+"] 의 상태가 "+vo.getStatus()+"로 변경되었습니다.");
+					
+					// 페이지 이동 (회원리스트)
+					jsp="redirect:list.do?"+pageObject.getPageQuery();
+					break;
+				
 				default:
-					System.out.println("###########################");
-					System.out.println("## 메뉴를 잘못 입력하셨습니다. ##");
-					System.out.println("## [0~7] 을 입력하세요.     ##");
-					System.out.println("###########################");
-				}
+					request.setAttribute("uri", uri);
+					jsp = "error/404";
+				} // end of switch
 			} catch (Exception e) {
-				// TODO: handle exception
 				e.printStackTrace();
-				System.out.println("$%@$%@$%@$%@$%@$%@$%@$%@$%@$%@");
-				System.out.println("$%@    <오류 출력> ");
-				System.out.println("$%@$%@$%@$%@$%@$%@$%@$%@$%@$%@");
-				// getSimpleName() : 클래스 이름만 보여주는 메서드(패키지는 안보여준다)
-				System.out.println("$%@ 타입 : " + e.getClass().getSimpleName());
-				// getMessage() : 예외의 내용을 보여주는 메서드
-				System.out.println("$%@ 내용 : " + e.getMessage() );
-				System.out.println("$%@ 조치 : 데이터 확인해 보세요");
-				System.out.println("$%@       계속 오류가 나면 전산담당자에게 문의하세요.");
-				System.out.println("$%@$%@$%@$%@$%@$%@$%@$%@$%@$%@");
+				// 예외객체를 jsp에서 사용하기 위해 request에 담는다.
+				request.setAttribute("e", e);
+				jsp = "error/500";
 			}
 			
 		return jsp;
@@ -366,43 +348,6 @@ public class MemberController {
 			} // end of switch
 		} // end of while()
 	} // end of update()
-	
-	
-	private void update_admin(MemberVO vo) throws Exception {
-		// 가져온 데이터 수정
-		while (true) {
-			new MemberPrint().print(vo);
-			System.out.println();
-			System.out.println("---------------------------------");
-			System.out.println("-- 1.회원등급, 2.회원상태         --");
-			System.out.println("-- 9.수정취소, 0.수정완료          --");
-			System.out.println("---------------------------------");
-			String menu = In.getStr("수정항목선택");
-			switch(menu) {
-			case "1":
-				vo.setGradeNo(In.getInt("회원등급(1:일반회원 or 9:관리자)"));
-				break;
-			case "2":
-				vo.setStatus(In.getStr("회원상태('정상' or '탈퇴')"));
-				break;
-			case "9":
-				System.out.println();
-				System.out.println("*** 수정이 취소 되었습니다. ***");
-				return; // update()메서드를 빠져나간다.
-			case "0":
-				// DB 처리
-				// 여기 (MemberController) -> Execute -> MemberUpdateAdminService
-				// -> MemberDAO().update_admin()
-				Execute.execute(new MemberUpdateAdminService(), vo);
-				return; // update()메서드를 빠져나간다. - 수정완료
-			default:
-				System.out.println("###########################");
-				System.out.println("## 항목를 잘못 선택 하셨습니다. ##");
-				System.out.println("## [0~6,9] 를 선택 하세요.   ##");
-				System.out.println("###########################");
-			} // end of switch
-		} // end of while()
-	} // end of update_admin()
 	
 	
 	

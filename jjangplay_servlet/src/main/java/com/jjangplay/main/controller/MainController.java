@@ -49,15 +49,15 @@ public class MainController {
 				jsp = "main/main";
 				break;
 			default:
+				request.setAttribute("uri", uri);
 				jsp = "error/404";
-			}
-			
+			} // end of switch
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-			// 예외객체를 jsp에서 사용하기 위해 requset에 담는다.
+			// 예외객체를 jsp에서 사용하기 위해 request에 담는다.
 			request.setAttribute("e", e);
-			jsp="error/500";
+			jsp = "error/500";
 		}
 		
 		

@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>공지사항 리스트</title>
+<title>회원 리스트</title>
 
 <!-- 4. 우리가 만든 라이브러리 등록 -->
 <script type="text/javascript" src="boardInputUtil.js"></script>
@@ -34,7 +34,7 @@ $(function(){
 <body>
 
 <div class="container p-3 my-3">
-	<h1><i class="fa fa-align-justify"></i> 공지사항 리스트</h1>
+	<h1><i class="fa fa-align-justify"></i> 회원 리스트</h1>
 	<form action="list.do" id="searchForm">
 		<div class="row">
 			<div class="col-md-8">
@@ -81,26 +81,64 @@ $(function(){
 	<!-- 데이터의 제목 줄 표시 -->
 	<tr>
 		<!-- th : table head - 테이블의 제목줄에 사용 -->
-		<!-- 리스트 : 번호, 제목, 게시일, 종료일 -->
-		<th>번호</th>
-		<th>제목</th>
-		<th>게시일</th>
-		<th>종료일</th>
+		<!-- 리스트 : 사진, 아이디, 이름, 생년월일, 연락처, 등급, 상태 -->
+		<th>사진</th>
+		<th>아이디</th>
+		<th>이름</th>
+		<th>생년월일</th>
+		<th>연락처</th>
+		<th>등급</th>
+		<th>상태</th>
 	</tr>
 	<!-- 실제 데이터 : 데이터가 있는 만큼 <tr></tr> -->
 	<c:forEach items="${list }" var="vo">
-		<tr onclick="location='view.do?no=${vo.no}&inc=1'" class="dataRow">
-			<td>${vo.no}</td>
-			<td>${vo.title}</td>
-			<td>${vo.startDate}</td>
-			<td>${vo.endDate}</td>
+		<tr class="dataRow">
+			<td>
+				<c:if test="${!empty vo.photo}">
+					<img src="${vo.photo}"
+					 style="width:30px;height:30px">
+				</c:if>
+				<c:if test="${empty vo.photo}">
+					<i class="fa fa-user-circle-o"
+					 style="font-size:30px"></i>
+				</c:if>
+			</td>
+			<td>${vo.id}</td>
+			<td>${vo.name}</td>
+			<td>${vo.birth}</td>
+			<td>${vo.tel}</td>
+			<td> <!-- 회원등급 시작 -->
+				<form action="changeGrade.do">
+					<input name="id" value="${vo.id }" type="hidden">
+					<div class="input-group mb-3">
+					  <select class="form-control" name="gradeNo" data-data="${vo.gradeNo }">
+					    <option value="1" ${(vo.gradeNo==1)?"selected":"" }>일반회원</option>
+					    <option value="9" ${(vo.gradeNo==9)?"selected":"" }>관리자</option>
+					  </select>
+					  <div class="input-group-append">
+					  	<button class="btn btn-success" disabled>변경</button>
+					  </div>
+					</div>
+				</form>
+			</td> <!-- 회원등급 끝 -->
+			<td> <!-- 회원상태 시작 -->
+				<form action="changeStatus.do">
+					<input name="id" value="${vo.id }" type="hidden">
+					<div class="input-group mb-3">
+					  <select class="form-control" name="status" data-data="${vo.status }">
+					    <option ${(vo.status == "정상")?"selected":"" }>정상</option>
+					    <option ${(vo.status == "탈퇴")?"selected":"" }>탈퇴</option>
+					    <option ${(vo.status == "휴면")?"selected":"" }>휴면</option>
+					    <option ${(vo.status == "강퇴")?"selected":"" }>강퇴</option>
+					  </select>
+					  <div class="input-group-append">
+					  	<button class="btn btn-success" disabled>변경</button>
+					  </div>
+					</div>
+				</form>
+			</td> <!-- 회원상태 끝 -->
 		</tr>
 	</c:forEach>
-	<tr>
-		<td colspan="5">
-			<a href="writeForm.do"><button class="btn btn-primary">등록</button></a>
-		</td>
-	</tr>
   </table>
   <div>
   	<pageNav:pageNav listURI="list.do" pageObject="${pageObject}"></pageNav:pageNav>

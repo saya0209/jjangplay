@@ -45,16 +45,3 @@ function lengthCheck(objName, name, min, max, isTrim) {
 		return true;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

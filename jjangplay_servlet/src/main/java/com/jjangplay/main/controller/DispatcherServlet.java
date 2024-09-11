@@ -3,7 +3,6 @@ package com.jjangplay.main.controller;
 import java.io.IOException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -78,6 +77,7 @@ public class DispatcherServlet extends HttpServlet {
 		// main처리 - localhost, localhost/main.do,
 		if (uri.equals("/") || uri.equals("/main.do")) {
 			response.sendRedirect("/main/main.do");
+			return;
 		}
 		
 		// uri : /module/기능 -> /board/list.do
@@ -86,6 +86,8 @@ public class DispatcherServlet extends HttpServlet {
 		System.out.println("pos = " + pos);
 		
 		if (pos == -1) {
+			request.setAttribute("uri", uri);
+			request.getRequestDispatcher("WEB-INF/views/error/noModule_404.jsp").forward(request, response);
 			return;
 		}
 		
@@ -123,6 +125,10 @@ public class DispatcherServlet extends HttpServlet {
 			System.out.println("===이미지게시판===");
 			jsp = imageController.execute(request);
 			break;
+		default:
+			request.setAttribute("uri", uri);
+			request.getRequestDispatcher("WEB-INF/views/error/noModule_404.jsp").forward(request, response);
+			return;
 		}
 		
 		System.out.println("jsp=" + jsp);

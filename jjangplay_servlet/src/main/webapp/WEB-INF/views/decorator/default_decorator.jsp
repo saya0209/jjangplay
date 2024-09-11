@@ -1,6 +1,6 @@
 <!-- sitemesh 사용을 위한 설정 파일 -->
 <!-- 작성자 : 박범한 -->
-<!-- 작성일 : 2024-09-05 -->
+<!-- 작성일 : 2017-01-12 -->
 <!-- 최종수정일 : 2024-09-05 -->
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -28,6 +28,8 @@
 	
 	<!-- awesome icon 라이브러리 등록 (CDN) -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<!-- google icon 라이브러리 등록 (CDN) -->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 	<style type="text/css">
 	
@@ -135,8 +137,13 @@
 						<a class="nav-link" href="/member/logout.do">
 						<i class="fa fa-sign-out"></i>로그아웃</a>
 					</li>
+					<c:if test="${login.gradeNo == 9 }">
+						<li class="nav-item">
+							<a class="nav-link" href="/member/list.do">회원리스트 보기</a>
+						</li>
+					</c:if>
 					<li class="nav-item">
-						<a class="nav-link" href="/member/view.do">내정보보기</a>
+						<a class="nav-link" href="/member/view.do">내정보 보기</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="/card/list.do">장바구니</a>
@@ -152,7 +159,7 @@
 		<decorator:body />
 	</article>
 	<footer class="container-fluid text-center">
-		<p>이 홈페이지의 저작권은 이현진에게 있습니다.</p>
+		<p>이 홈페이지의 저작권은 박범한에게 있습니다.</p>
 	</footer>
 	
 	<!-- session 담은 msg를 보여주는 모달창 -->
