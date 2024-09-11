@@ -60,9 +60,12 @@ public class MemberDAO extends DAO {
 			// 7.DB닫기
 			DB.close(con, pstmt, rs);
 		}
+		
+		
 		// 결과값 리턴 (호출한 메서드에 전달)
 		return list;
 	}
+
 
 	// 2. 회원정보보기
 	// MemberController("2")->Execute->MemberViewService->여기까지 왔어요
@@ -151,7 +154,43 @@ public class MemberDAO extends DAO {
 		// 결과값 리턴(호출한 메서드에 넘겨줌)
 		return result;
 	}
-	
+
+	// 3-1. 아이디 중복체크 처리
+	// MemberController("3")->Execute->MemberCheckIdService->여기까지 왔습니다.
+ 	public String checkId(String id) throws Exception {
+		// 결과를 저장할 수 있는 변수
+		String result = null;
+		try {
+			// 1.드라이버확인
+			// 2.DB연결
+			con = DB.getConnection();
+			// 3.SQL (WRITE)
+			// 4.실행객체에 데이터세팅
+			pstmt = con.prepareStatement(CHECKID);
+			pstmt.setString(1, id);
+
+			// 5.실행
+			rs = pstmt.executeQuery();
+			
+			// 6.결과담기
+			if (rs != null && rs.next()) {
+				result = rs.getString("id");
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			throw new Exception("예외발생 : 아이디중복체크 중 DB처리중 예외가 발생했습니다.");
+		} finally {
+			// 7.DB닫기
+			DB.close(con, pstmt);
+		}
+		
+		// 결과값 리턴(호출한 메서드에 넘겨줌)
+		return result;
+	}
+
+ 	
  	// 4. 회원정보 수정
  	// MemberController("4")->Execute->MemberUpdateService->여기까지
  	public int update(MemberVO vo) throws Exception {
@@ -239,7 +278,7 @@ public class MemberDAO extends DAO {
 	// -> 여기에 (login()) 에 왔습니다.
 	public LoginVO login(LoginVO vo) throws Exception {
 		// 결과를 저장할 객체선언
-		LoginVO loginVO = null;
+		LoginVO loginvo = null;
 		
 		try {
 			// 1.드라이버확인
@@ -254,17 +293,17 @@ public class MemberDAO extends DAO {
 			rs = pstmt.executeQuery();
 			// 6.데이터 저장
 			if (rs != null && rs.next()) {
-				loginVO = new LoginVO();
-				loginVO.setId(rs.getString("id"));
-				loginVO.setPw(rs.getString("pw"));
-				loginVO.setName(rs.getString("name"));
-				loginVO.setGradeNo(rs.getInt("gradeNo"));
-				loginVO.setGradeName(rs.getString("gradeName"));
-				loginVO.setPhoto(rs.getString("photo"));
-				loginVO.setNewMsgCnt(rs.getLong("newMsgCnt"));
+				loginvo = new LoginVO();
+				loginvo.setId(rs.getString("id"));
+				loginvo.setPw(rs.getString("pw"));
+				loginvo.setName(rs.getString("name"));
+				loginvo.setGradeNo(rs.getInt("gradeNo"));
+				loginvo.setGradeName(rs.getString("gradeName"));
+				loginvo.setPhoto(rs.getString("photo"));
+				loginvo.setNewMsgCnt(rs.getLong("newMsgCnt"));
 			}
 			
-			if (loginVO == null) {
+			if (loginvo == null) {
 				// 아이디나 패스워드가 맞지 않을때
 				throw new Exception("예외발생 : 아이디나 비밀번호가 맞지 않습니다.");
 			}
@@ -281,7 +320,7 @@ public class MemberDAO extends DAO {
 			DB.close(con, pstmt, rs);
 		}
 		
-		return loginVO;
+		return loginvo;
 	}
 	
 	// 6-1. 최근접속일 수정
@@ -358,15 +397,19 @@ public class MemberDAO extends DAO {
 		return result;
 	}
 	
-	final String LIST =""
-			+ "select id, name, birth, tel, gradeNo, gradeName, status, photo from "
-				+ "(select rownum rnum, id, name, birth, tel, gradeNo, gradeName, status, photo from "
-					+ "(select m.id, m.name, "
+	final String LIST = ""
+			+ " select id, name, birth, tel, gradeNo, "
+			+ " gradeName, status, photo from "
+				+ " (select rownum rnum, id, name, birth, tel,"
+				+ " gradeNo, gradeName, status, photo from "
+					+ " (select m.id, m.name, "
 					+ " to_char(m.birth, 'yyyy-mm-dd') birth, m.tel, "
 					+ " m.gradeNo, g.gradeName, m.status, m.photo "
 					+ " from member m, grade g "
 					+ " where m.gradeNo = g.gradeNo "
-					+ " order by id asc))"
+					+ " order by id asc"
+					+ ")"
+				+ ")"
 			+ " where rnum>=? and rnum<=?";
 	
 	
@@ -382,6 +425,8 @@ public class MemberDAO extends DAO {
 	final String WRITE = "insert into member "
 			+ " (id, pw, name, gender, birth, tel, email, photo) "
 			+ " values (?, ?, ?, ?, ?, ?, ?, ?)";
+	
+	final String CHECKID = "select id from member where id=?";
 	
 	final String UPDATE = "update member "
 			+ " set name = ?, gender = ?, birth = ?, "

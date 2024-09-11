@@ -1,4 +1,4 @@
-package com.jjangplay.util.Filter;
+package com.jjangplay.util.filter;
 
 import java.io.IOException;
 import javax.servlet.Filter;
@@ -11,19 +11,16 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpFilter;
 
 /**
- * Servlet Filter implementation class IncodingFilter
+ * Servlet Filter implementation class EncodingFilter
  */
-@SuppressWarnings("serial")
-@WebFilter("/EncodingFilter")
+//@WebFilter("/EncodingFilter")
 public class EncodingFilter extends HttpFilter implements Filter {
-       
-    /**
-     * @see HttpFilter#HttpFilter()
-     */
-    public EncodingFilter() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 
 	/**
 	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
@@ -31,9 +28,10 @@ public class EncodingFilter extends HttpFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		// TODO Auto-generated method stub
 		// place your code here
-		System.out.println("EncodingFilter.doFilter()-------------------");
+		System.out.println("EncodingFilter.doFilter() ---------------");
 		// 한글처리 - 들어오는 데이터에 대한 인코딩
 		request.setCharacterEncoding("utf-8");
+		
 
 		// pass the request along the filter chain
 		chain.doFilter(request, response);

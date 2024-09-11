@@ -1,11 +1,12 @@
 package com.jjangplay.image.service;
 
+
 import com.jjangplay.image.dao.ImageDAO;
 import com.jjangplay.image.vo.ImageVO;
 import com.jjangplay.main.dao.DAO;
 import com.jjangplay.main.service.Service;
 
-public class ImageUpdateService implements Service {
+public class ImageChangeService implements Service {
 
 private ImageDAO dao;
 	
@@ -16,8 +17,10 @@ private ImageDAO dao;
 	
 	@Override
 	public Integer service(Object obj) throws Exception {
-		// [ImageController] -> (Execute) -> ImageUpdateService -> [ImageDAO.update()]
-		return dao.update((ImageVO)obj);
+		// [BoardController] -> (Execute) -> BoardWriteService -> [BoardDAO.imageChange()]
+		// 생성하고 실행한다.
+		// Object 로 선언된 obj 를 다운캐스팅해서 넘겨준다.
+		return dao.imageChange((ImageVO)obj);
 	}
 
 }

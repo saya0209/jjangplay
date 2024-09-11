@@ -28,7 +28,7 @@
     <div class="form-group">
       <label for="imageFile">첨부이미지</label>
       <input type="file" class="form-control" id="imageFile"
-       required="required" title="첨부할 이미지를 선택하세요" placeholder="이미지 파일 선택" name="imageFile">
+       required="required" title="첨부할 이미지를 선택하세요" placeholder="이미지 파일 선택" name="imageFile" >
     </div>
    
     <button type="submit" class="btn btn-primary">등록</button>

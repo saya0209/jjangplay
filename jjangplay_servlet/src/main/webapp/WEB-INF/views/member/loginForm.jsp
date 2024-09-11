@@ -9,7 +9,7 @@
 <body>
 	<div class="container">
 		<h3>로그인 폼</h3>
-		<form action="login.do" method="post">
+		<form action="/member/login.do" method="post">
 			<div class="form-group">
 				<label for="id"> ID</label>
 				<input type="text" class="form-control" placeHolder="ID입력" id="id" name="id" autocomplete="none">
