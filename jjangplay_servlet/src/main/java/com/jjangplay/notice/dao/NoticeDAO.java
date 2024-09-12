@@ -17,94 +17,46 @@ public class NoticeDAO extends DAO {
 	// 실행객체 : PreparedStatement
 	// 데이터저장객체 : ResultSet
 	// 접속정보 : DB 클래스를 통해서 받는다.
-	// [BoardController] -> (Execute) -> NoticeListService -> [NoticeDAO.list()]
-	public Long getTotalRow(PageObject pageobject) throws Exception {
-	    Long totalRow = null;
-	    
-	    System.out.println("---- NoticeDAO.getTotalRow() 시작 ----");
-	    
-	    try {
-	        // 1. DB 연결
-	        con = DB.getConnection();
 
-	        // 2. SQL - NoticeDAO 클래스에 final 변수로 설정 - TOTALROW
-	        pstmt = con.prepareStatement(TOTALROW);
-
-	        // 3. 실행 및 데이터 받기
-	        rs = pstmt.executeQuery();
-
-	        // 4. 결과 저장
-	        if (rs != null && rs.next()) {
-	            totalRow = rs.getLong(1);
-	        }
-	    } catch (Exception e) {
-	        // 5. 예외 처리
-	        e.printStackTrace();
-	        throw e; // 필요 시 예외를 다시 던질 수 있습니다.
-	    } finally {
-	        // 6. DB 자원 닫기
-	        try {
-	            DB.close(con, pstmt, rs);
-	        } catch (Exception e) {
-	            // 7. 자원 닫기 중 예외 처리
-	            e.printStackTrace();
-	        }
-	    }
-	    
-	    System.out.println("---- NoticeDAO.getTotalRow() 끝 ----");
-	    return totalRow;
-	}
-
-
-	private String getListSQL(PageObject pageObject) {
-		String sql = LIST;
-		sql += getSearch(pageObject);
-		sql += " order by startDate, no desc))";
-		sql += " where rnum>=? and rnum<=?";
-		 
-		return sql;
-
-	}
-	
-	private String getSearch(PageObject pageObject) {
-	    String sql = "";
-	    String key = pageObject.getKey();
-	    String word = pageObject.getWord();
-	    
-	    if (word != null && !word.equals("")) {
-	        // 검색 조건이 있을 때만 WHERE 절 추가
-	        sql += " where";
-	        
-	        boolean firstCondition = true;
-	        
-	        // 제목 검색 조건
-	        if (key.indexOf("t") >= 0) { sql += " title like ?";
-	            firstCondition = false;
-	        }
-	        // 내용 검색 조건
-	        if (key.indexOf("c") >= 0) { if (!firstCondition) sql += " or";
-	            sql += " content like ?";
-	            firstCondition = false;
-	        }
-	    }
-	    
-	    return sql;
-	}
-
-	
-	private int setSearchDate(PageObject pageObject, PreparedStatement pstmt, int idx) throws SQLException{
-		String key = pageObject.getKey();
-		String word = pageObject.getWord();
-		if(word != null && !word.equals("")) {
-			if(key.indexOf("t")>=0)pstmt.setString(++idx, "%"+word+"%");
-			if(key.indexOf("c")>=0)pstmt.setString(++idx, "%"+word+"%");
+	// 1-1.전체 데이터 갯수
+	// [NoticeController] -> (Execute) -> NoticeListService -> [NoticeDAO.list()]
+	public Long getTotalRow(PageObject pageObject) throws Exception {
+		// 결과를 저장할 수 있는 변수
+		Long totalRow = null;
+		
+		System.out.println("---- NoticeDAO.getTotalRow() 시작 ----");
+		try {
+			// 1. 드라이버확인
+			// 드라이버 확인은 프로그램이 시작될 때 한번만 필요 - MAIN에 구현
+			// 2. DB 연결
+			con = DB.getConnection();
+			// 3. SQL - NoticeDAO 클래스에 final 변수로 설정 - TOTALROW
+			// 4. 실행객체에 데이터 넘기기
+			pstmt = con.prepareStatement(TOTALROW);
+			// 5. 실행 및 데이터 받기
+			rs = pstmt.executeQuery();
+			// 6. 표시 및 저장
+			if (rs != null && rs.next()) {
+				totalRow = rs.getLong(1);
+			} // end of if(rs)
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			try {
+				// 7. DB 닫기
+				DB.close(con, pstmt, rs);
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
 		}
-		return idx;
-	}
+		
+		System.out.println("---- NoticeDAO.getTotalRow() 끝 ----");
+		return totalRow;
+	} // end of getTotalRow()
 	
 	
-			
-			
 	// 1. 리스트 처리
 	public List<NoticeVO> list(PageObject pageObject) throws Exception {
 		// 결과를 저장하는 객체
@@ -115,13 +67,13 @@ public class NoticeDAO extends DAO {
 			// 2. DB 연결
 			con = DB.getConnection();
 			// 3. SQL 작성
+			System.out.println("LIST_SQL = " + getListSQL(pageObject));
 			// 4. 실행객체에 데이터세팅
 			pstmt = con.prepareStatement(getListSQL(pageObject));
 			int idx = 0;
 			idx = setSearchDate(pageObject, pstmt, idx);
 			pstmt.setLong(++idx, pageObject.getStartRow());
 			pstmt.setLong(++idx, pageObject.getEndRow());
-			
 			// 5. 실행
 			rs = pstmt.executeQuery();
 			// 6. 데이터 담기 및 표시
@@ -134,7 +86,6 @@ public class NoticeDAO extends DAO {
 					vo.setTitle(rs.getString("title"));
 					vo.setStartDate(rs.getString("startDate"));
 					vo.setEndDate(rs.getString("endDate"));
-					vo.setWriteDate(rs.getString("writeDate"));
 					
 					// vo -> list 담는다.
 					// 한줄 꺼낸것을 list에 저장한다.
@@ -298,12 +249,80 @@ public class NoticeDAO extends DAO {
 		return result;
 	}
 	
+	private String getListSQL(PageObject pageObject) {
+		String sql = LIST;
+		sql += getSearch(pageObject);
+		sql += getPeriod(pageObject);
+		sql += " order by updateDate, no desc)) ";
+		sql += " where rnum>=? and rnum<=?";
+		return sql;
+	}
+	
+	private String getSearch(PageObject pageObject) {
+		String sql = "";
+		String key = pageObject.getKey();
+		String word = pageObject.getWord();
+		if (word != null && !word.equals("")) {
+			sql += " and ( 1=0 "; //or 조건을 만들때 1=0을 준다.
+			// key 값에 조건이 있다 t : title, c : content
+			if (key.indexOf("t") >= 0) sql += " or title like ? ";
+			if (key.indexOf("c") >= 0) sql += " or content like ? ";
+			sql += " ) ";
+			
+		}
+		
+		return sql;
+	}
+	
+	// 공지사항 기간 조건을 주는 SQL
+	private String getPeriod(PageObject pageObject) {
+		String sql = "";
+		String period = pageObject.getPeriod();
+		
+		sql += " and ((1=1) ";
+		if (period.equals("pre")) {
+			// 현재공지
+			sql += " and (trunc(sysdate) between trunc(startDate) and trunc(EndDate)) ";
+		}
+		else if (period.equals("old")) {
+			// 지난공지
+			sql += " and (trunc(sysdate) > trunc(endDate)) ";
+		}
+		else if (period.equals("res")) {
+			// 예약공지
+			sql += " and (trunc(sysdate) < trunc(startDate)) ";
+		}
+		sql += " ) ";
+		return sql;
+	}
+	
+	// pstmt에 데이터 세팅하는 메서드
+	private int setSearchDate(PageObject pageObject,
+			PreparedStatement pstmt, int idx) throws SQLException  {
+		String key = pageObject.getKey();
+		String word = pageObject.getWord();
+		if (word != null && !word.equals("")) {
+			if (key.indexOf("t") >= 0) pstmt.setString(++idx, "%" + word +"%");
+			if (key.indexOf("c") >= 0) pstmt.setString(++idx, "%" + word +"%");
+		}
+		
+		return idx;
+	}
+
 	
 	// SQL문 작성
-	final String LIST = "select no, title, startDate, endDate, writeDate from (select rownum rnum, no, title, startDate, endDate, writeDate from (select no, title, to_char(startDate, 'yyyy-mm-dd') startDate, to_char(endDate, 'yyyy-mm-dd') endDate, to_char(writeDate, 'yyyy-mm-dd') writeDate "
-			+ " from Notice ";
+	final String LIST = ""
+			+ " select no, title, startDate, endDate from "
+			+ " (select rownum rnum, no, title, startDate, endDate from "
+			+ " (select no, title,"
+			+ " to_char(startDate, 'yyyy-mm-dd') startDate, "
+			+ " to_char(endDate, 'yyyy-mm-dd') endDate "
+			+ " from Notice where ( 1=1 ) ";
+			
+		//	" order by updateDate, no desc)) "
+		//	+ " where rnum>=? and rnum<=?";
 	
-	final String TOTALROW ="select count(*) from notice";
+	final String TOTALROW = "select count(*) from notice";
 	
 	final String VIEW = "select no, title, content, "
 			+ " to_char(startDate, 'yyyy-mm-dd') startDate, "

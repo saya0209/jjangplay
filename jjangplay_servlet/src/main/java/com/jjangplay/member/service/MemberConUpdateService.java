@@ -15,7 +15,7 @@ public class MemberConUpdateService implements Service {
 	}
 	@Override
 	public Integer service(Object obj) throws Exception {
-		// MemberController(로그인이 되면)->Execute
+		// ConUpdateFilter->Execute
 		// -> 여기로 옴
 		// -> 여기에서 -> MemberDAO().conUpdate(id)
 		return dao.conUpdate((String)obj);

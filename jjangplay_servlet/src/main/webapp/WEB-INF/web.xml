@@ -50,6 +50,15 @@
   	<url-pattern>*.do</url-pattern>
   </filter-mapping>
   
+  <filter>
+  	<filter-name>conUpdate</filter-name>
+  	<filter-class>com.jjangplay.util.filter.ConUpdateFilter</filter-class>
+  </filter>
+  
+  <filter-mapping>
+  	<filter-name>conUpdate</filter-name>
+  	<url-pattern>*.do</url-pattern>
+  </filter-mapping>
   <!-- 예외와 에러처리 - error-page tag 설정
   		- error-code : 브라우저나 통신에서 보여지는 에러 코드로 서버에서 처리
   		- exception-type : 내부오류 500dml Exception종류에 따라 처리

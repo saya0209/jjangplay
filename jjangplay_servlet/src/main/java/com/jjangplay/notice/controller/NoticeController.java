@@ -1,19 +1,18 @@
 package com.jjangplay.notice.controller;
 
-
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import com.jjangplay.main.controller.Init;
+import com.jjangplay.member.vo.LoginVO;
 import com.jjangplay.notice.vo.NoticeVO;
 import com.jjangplay.util.exe.Execute;
 import com.jjangplay.util.page.PageObject;
 
 public class NoticeController {
 
-	@SuppressWarnings("null")
 	public String execute(HttpServletRequest request) {
-		// 공지사항 나가는 명령 줄때까지 무한반복
-		
+			
 			// uri
 			String uri = request.getRequestURI();
 			// 이동할 주소
@@ -25,6 +24,21 @@ public class NoticeController {
 			// 입력 받는 데이터 (글번호를 위한)
 			Long no = 0L;
 			
+			// 처리 결과 표시(모달창)과 로그인 여부 확인 위한
+			// session을 가져온다.
+			HttpSession session = request.getSession();
+			
+			String id = null;
+			int gradeNo = 0;
+			LoginVO login = (LoginVO) session.getAttribute("login");
+			
+			if (login != null) {
+				// login != null 이면 로그인 상태임
+				// 아이디와 회원등급을 가져온다.
+				id = login.getId();
+				gradeNo = login.getGradeNo();
+			}
+			
 			try {
 				switch (uri) {
 				case "/notice/list.do":
@@ -33,12 +47,27 @@ public class NoticeController {
 					System.out.println("1. 공지사항 리스트");
 					// 페이지 처리를 위한 객체, 넘어오는 페이지와 검색정보를 세팅
 					PageObject pageObject = PageObject.getInstance(request);
+					// 공지사항 표시정보
+					String period = request.getParameter("period");
+					
+					System.out.println("period=" + period);
+					
+					if (gradeNo == 9) {
+						// 관리자는 공지사항 기본이 모든공지 리스트 보기 
+						if (period == null || period == "") {
+							period = "all";
+						}
+					}
+					else {
+						period = "pre";
+					}
+					pageObject.setPeriod(period);
+					
 					// DB에서 데이터 가져오기
 					result = Execute.execute(Init.get(uri), pageObject);
 					// 가져온 데이터 담기
 					request.setAttribute("list", result);
 					request.setAttribute("pageObject", pageObject);
-					// "/WEB-INF/view/"+ notice/list".jsp"
 					jsp = "notice/list";
 					break;
 				case "/notice/view.do":
@@ -46,20 +75,20 @@ public class NoticeController {
 					// NoticeController -> execute -> NoticeViewService
 					// -> NoticeDAO.view()
 					// 공지사항은 조회수가 없으므로 increase()메서드가 없다.
-					no = Long.parseLong( request.getParameter("no"));
+					no = Long.parseLong(request.getParameter("no"));
 					// DB에서 데이터를 가져오기
 					result = Execute.execute(Init.get(uri), no);
+					// 가져온 데이터를 담는다.(저장한다)
 					request.setAttribute("vo", result);
-					
-					jsp="notice/view";
-
+					// 데이터를 화면에 보여준다.
+					jsp = "notice/view"; //jsp 파일 + 경로
 					break;
 				case "/notice/writeForm.do":
-					System.out.println("3. 일반게시판 글쓰기 폼");
-					jsp="notice/writeForm";
+					System.out.println("3. 공지사항 글쓰기 폼");
+					jsp = "notice/writeForm";
 					break;
 				case "/notice/write.do":
-					System.out.println("3. 공지사항 글쓰기");
+					System.out.println("3. 공지사항 글쓰기 처리");
 					// 데이터 수집
 					// 제목, 내용, 게시시작일, 게시종료일
 					String title = request.getParameter("title");
@@ -76,26 +105,29 @@ public class NoticeController {
 					// NoticeController -> execute -> NoticeWriteService
 					// -> NoticeDAO.write()
 					Execute.execute(Init.get(uri), vo);
-					// jsp 정보앞에 "redirect:" 가 붙어있으면 redirect로 처리한다 없으면 forword
-					jsp = "redirect:list.do";
 					
+					jsp = "redirect:list.do";
 					break;
 				case "/notice/updateForm.do":
 					System.out.println("4. 공지사항 글수정 폼");
 					// 수정 글번호
 					no = Long.parseLong(request.getParameter("no"));
-					// 수정할 데이터 가져오기
-					result = Execute.execute(Init.get("/notice/view.do"), no);
-					// 가져온 데이터 담기
+					
+					// 수정할 데이터 가져오기 (view 서비스를 이용해서)
+					result = Execute.execute(
+							Init.get("/notice/view.do"), no);
+					
+					// 가져온 데이터를 담는다.
 					request.setAttribute("vo", result);
-					// 가져온 데이터를 jsp로 보낸다
+					
+					// 담은 데이터를 jsp로 보내서 보여준다.
 					jsp = "notice/updateForm";
 					break;
 				case "/notice/update.do":
 					System.out.println("4. 공지사항 글수정 처리");
-					// 수정 글번호
+					
+					// updateForm에서 수정한 데이터를 가져옵니다.
 					no = Long.parseLong(request.getParameter("no"));
-					// updateForm에서 수정한 데이터를 가져온다.
 					title = request.getParameter("title");
 					content = request.getParameter("content");
 					startDate = request.getParameter("startDate");
@@ -108,13 +140,13 @@ public class NoticeController {
 					vo.setStartDate(startDate);
 					vo.setEndDate(endDate);
 					
-					// DB에 수정내용 저장
-					Execute.execute(Init.get(uri), vo);
-					if((Integer)result != 0) {
-						System.out.println("*****수정이 완료되었습니다.******");
+					// DB에 수정 내용 적용
+					result = Execute.execute(Init.get(uri), vo);
+					if ((Integer)result != 0) {
+						System.out.println("*** 수정이 완료되었습니다. ***");
 					}
-					jsp = "redirect:view.do?no="+no;
 					
+					jsp = "redirect:view.do?no="+no;
 					break;
 				case "/notice/delete.do":
 					System.out.println("5. 공지사항 글삭제");
@@ -129,19 +161,19 @@ public class NoticeController {
 					}
 					jsp = "redirect:list.do";
 					break;
-				
 				default:
 					request.setAttribute("uri", uri);
 					jsp = "error/404";
-				} // end of switch
+					break;
+				} // end of switch(menu)
 			} catch (Exception e) {
 				// TODO: handle exception
 				e.printStackTrace();
-				// 예외객체를 jsp에서 사용하기 위해 request에 담는다.
 				request.setAttribute("e", e);
 				jsp = "error/500";
-			}
+			} // end of try~catch
 			
 			return jsp;
+
 	} // end of execute()
 } // end of class

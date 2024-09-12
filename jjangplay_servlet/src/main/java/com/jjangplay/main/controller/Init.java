@@ -25,10 +25,14 @@ import com.jjangplay.main.dao.DAO;
 import com.jjangplay.main.service.Service;
 import com.jjangplay.member.dao.MemberDAO;
 import com.jjangplay.member.service.MemberChangeGradeNoService;
+import com.jjangplay.member.service.MemberChangePhotoService;
 import com.jjangplay.member.service.MemberChangeStatusService;
 import com.jjangplay.member.service.MemberCheckIdService;
+import com.jjangplay.member.service.MemberConUpdateService;
+import com.jjangplay.member.service.MemberDeleteService;
 import com.jjangplay.member.service.MemberListService;
 import com.jjangplay.member.service.MemberLoginService;
+import com.jjangplay.member.service.MemberUpdateService;
 import com.jjangplay.member.service.MemberViewService;
 import com.jjangplay.member.service.MemberWriteService;
 import com.jjangplay.notice.dao.NoticeDAO;
@@ -111,17 +115,25 @@ public class Init {
 		serviceMap.put("/member/list.do", new MemberListService());
 		serviceMap.put("/member/view.do", new MemberViewService());
 		serviceMap.put("/member/write.do", new MemberWriteService());
+		serviceMap.put("/member/update.do", new MemberUpdateService());
+		serviceMap.put("/member/delete.do", new MemberDeleteService());
+		serviceMap.put("/member/changePhoto.do", new MemberChangePhotoService());
 		serviceMap.put("/ajax/checkId.do", new MemberCheckIdService());
 		serviceMap.put("/member/changeGradeNo.do", new MemberChangeGradeNoService());
 		serviceMap.put("/member/changeStatus.do", new MemberChangeStatusService());
+		serviceMap.put("/member/conUpdate.do", new MemberConUpdateService());
 		// 조립 dao->service
 		serviceMap.get("/member/login.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/list.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/view.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/write.do").setDAO(daoMap.get("memberDAO"));
+		serviceMap.get("/member/update.do").setDAO(daoMap.get("memberDAO"));
+		serviceMap.get("/member/delete.do").setDAO(daoMap.get("memberDAO"));
+		serviceMap.get("/member/changePhoto.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/ajax/checkId.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/changeGradeNo.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/changeStatus.do").setDAO(daoMap.get("memberDAO"));
+		serviceMap.get("/member/conUpdate.do").setDAO(daoMap.get("memberDAO"));
 		
 		
 		// dao를 생성

@@ -6,15 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.jjangplay.main.controller.Init;
-import com.jjangplay.main.controller.Main;
-import com.jjangplay.member.service.MemberDeleteService;
-import com.jjangplay.member.service.MemberUpdateService;
-import com.jjangplay.member.service.MemberViewService;
 import com.jjangplay.member.vo.LoginVO;
 import com.jjangplay.member.vo.MemberVO;
 import com.jjangplay.util.exe.Execute;
-import com.jjangplay.util.io.In;
-import com.jjangplay.util.io.MemberPrint;
 import com.jjangplay.util.page.PageObject;
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
@@ -22,6 +16,7 @@ import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 // 회원관리를 위한 모듈
 public class MemberController {
 
+	@SuppressWarnings("unused")
 	public String execute(HttpServletRequest request) {
 
 		System.out.println("MemberController.execute()----------------");
@@ -191,29 +186,42 @@ public class MemberController {
 					// /board/list.do로 이동한다.
 					jsp="redirect:/main/main.do";
 					break;
-				case "member/update.do":
-					System.out.println("4.내 정보 수정");
-					// 가장먼저 login 되어있는지 확인
-					if (Main.login == null) throw new Exception("예외발생 : 로그인이 필요합니다.");
+				case "/member/updateForm.do":
+					System.out.println("4.1 내 정보 수정 폼");
+					id= request.getParameter("id");
 					
-					// 내정보 가져오기
-					id = Main.login.getId();
-					vo = (MemberVO) Execute.execute(new MemberViewService(), id);
+					// id를 가지고 DB에서 데이터 가져옵니다.
+					// 여기서(MemberController)->Execute->MemberUpdateService->MemberDAO.update()
+					result = Execute.execute(Init.get("/member/view.do"), id);
+					
+					request.setAttribute("vo", result);
+					jsp ="member/updateForm";
+					break;
+				case "/member/update.do":
+					System.out.println("4.내 정보 수정 처리");
 					
 					// 정보수정과 DB처리 메서드를 이용
-					update(vo);
+					vo = new MemberVO();
+					vo.setId(request.getParameter("id"));
+					vo.setPw(request.getParameter("pw"));
+					vo.setName(request.getParameter("name"));
+					vo.setGender(request.getParameter("gender"));
+					vo.setBirth(request.getParameter("birth"));
+					vo.setTel(request.getParameter("tel"));
+					vo.setEmail(request.getParameter("email"));
+					
+					Execute.execute(Init.get(uri), vo);
+					
+					session.setAttribute("msg", "정보가 수정되었습니다.");				
+					
+					jsp ="redirect:/member/view.do?id="+vo.getId();
+					
 					break;
-				case "member/delete.do":
+				case "/member/delete.do":
 					System.out.println("5.회원탈퇴");
 					// 회원상태를 "탈퇴" 로 변경
-					if (Main.login == null) {
-						id = In.getStr("아이디");
-						pw = In.getStr("비밀번호");
-					}
-					else {
-						id = Main.login.getId();
-						pw = Main.login.getPw();
-					}
+					id = request.getParameter("id");
+					pw = request.getParameter("pw");
 					
 					vo = new MemberVO();
 					vo.setId(id);
@@ -222,18 +230,21 @@ public class MemberController {
 					// DB처리
 					// MemberControll(여기)->Execute->MemberDeleteService
 					// ->MemberDAO().delete(MemberVO vo)
-					result = Execute.execute(new MemberDeleteService(), vo);
+					result = Execute.execute(Init.get(uri), vo);
 					
 					// 탈퇴 후에는 로그아웃 처리, 메시지
 					if ((Integer)result == 1) {
-						Main.login = null; // 로그아웃
-						
+				
 						System.out.println();
 						System.out.println("******************************");
 						System.out.println("** 회원 탈퇴 처리가 완료되었습니다. **");
 						System.out.println("** 로그아웃이 되었습니다.         **");
 						System.out.println("******************************");
 					}
+					session.setAttribute("msg", "탈퇴 처리 되었습니다.");
+					session.removeAttribute("login");
+					
+					jsp="redirect:/main/main.do";
 					break;
 				case "/member/changeGradeNo.do":
 					System.out.println("회원등급 수정 처리");
@@ -282,7 +293,43 @@ public class MemberController {
 					// 페이지 이동 (회원리스트)
 					jsp="redirect:list.do?"+pageObject.getPageQuery();
 					break;
-				
+				case "/member/changePhoto.do":
+					System.out.println("회원정보 사진 바꾸기 처리");
+					// 이미지 업로드 처리
+					// new MultipartRequest(request, 실제저장위치, 사이즈제한,
+					//	encoding, 중복처리객체-다른이름으로)
+					// request를 multi에 담으면 request의 내용은 사라진다.
+					multi =
+						new MultipartRequest(request, realSavePath, sizeLimit,
+							"utf-8", new DefaultFileRenamePolicy());
+					
+					// 데이터 수집(사용자:form->서버->request->multi)
+					// 글번호, 새로운 이미지 경로+파일이름
+					id = multi.getParameter("id");
+					photo = multi.getFilesystemName("imageFile");
+					
+					String deleteFileName = multi.getParameter("deleteFileName");
+					
+					// 변수 vo에 id와 photo를 담는다.
+					vo = new MemberVO();
+					vo.setId(id);
+					vo.setPhoto(savePath + "/" +photo);
+					
+					// 서비스로 간다.
+					// MemberController -> Execute
+					// -> MemberChangePhotoService()
+					// -> MemberDAO.changePhoto()
+					Execute.execute(Init.get(uri), vo);
+					
+					// 기존 이미지 파일을 지운다. (존재하면)
+					File deleteFile = new File(request.getServletContext()
+							.getRealPath(deleteFileName));
+					if (deleteFile.exists()) deleteFile.delete();
+					
+					session.setAttribute("msg", "사진 바꾸기가 성공했습니다.");
+					
+					jsp = "redirect:view.do?id=" + id;
+					break;
 				default:
 					request.setAttribute("uri", uri);
 					jsp = "error/404";
@@ -296,81 +343,5 @@ public class MemberController {
 			
 		return jsp;
 	} // end of execute()
-	
-	// 정보수정DB처리를 위한 메서드
-	private void update(MemberVO vo) throws Exception {
-		// 가져온 데이터 수정
-		while (true) {
-			new MemberPrint().print(vo);
-			System.out.println();
-			System.out.println("---------------------------------");
-			System.out.println("-- 1.이름, 2.성별, 3.생년월일,     --");
-			System.out.println("-- 4.연락처, 5.이메일, 6.사진,     --");
-			System.out.println("-- 9.수정취소, 0.수정완료          --");
-			System.out.println("---------------------------------");
-			String menu = In.getStr("수정항목선택");
-			switch(menu) {
-			case "1":
-				vo.setName(In.getStr("이름"));
-				break;
-			case "2":
-				vo.setGender(In.getStr("성별(남자/여자)"));
-				break;
-			case "3":
-				vo.setBirth(In.getStr("생년월일(YYYY-MM-DD)"));
-				break;
-			case "4":
-				vo.setTel(In.getStr("연락처"));
-				break;
-			case "5":
-				vo.setEmail(In.getStr("이메일"));
-				break;
-			case "6":
-				vo.setPhoto(In.getStr("사진"));
-				break;
-			case "9":
-				System.out.println();
-				System.out.println("*** 수정이 취소 되었습니다. ***");
-				return; // update()메서드를 빠져나간다.
-			case "0":
-				// 수정하기전 본인확인용 비밀번호를 받는다.
-				vo.setPw(In.getStr("비밀번호"));
-				// DB 처리
-				// 여기 (MemberController) -> Execute -> MemberUpdateService
-				// -> MemberDAO().update()
-				Execute.execute(new MemberUpdateService(), vo);
-				return; // update()메서드를 빠져나간다. - 수정완료
-			default:
-				System.out.println("###########################");
-				System.out.println("## 항목를 잘못 선택 하셨습니다. ##");
-				System.out.println("## [0~6,9] 를 선택 하세요.   ##");
-				System.out.println("###########################");
-			} // end of switch
-		} // end of while()
-	} // end of update()
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		
 } // end of class

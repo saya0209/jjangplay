@@ -9,6 +9,7 @@ import com.jjangplay.util.page.PageObject;
 
 public class MainController {
 
+	@SuppressWarnings("unused")
 	public String execute(HttpServletRequest request) {
 		System.out.println("MainController.execute()---------------");
 		

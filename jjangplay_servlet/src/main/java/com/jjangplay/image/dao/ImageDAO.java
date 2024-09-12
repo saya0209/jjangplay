@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jjangplay.board.vo.BoardVO;
 import com.jjangplay.image.vo.ImageVO;
 import com.jjangplay.main.dao.DAO;
 import com.jjangplay.util.db.DB;

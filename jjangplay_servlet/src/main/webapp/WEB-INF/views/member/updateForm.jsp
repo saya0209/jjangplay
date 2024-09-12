@@ -129,83 +129,63 @@ $(function() {
 <!-- 알파벳과한글사용가능한패턴이 3,20자 => ^[a-z가-힣]{3,20}$ -->
 <!-- 공백을 제외한 모든가 가능한 3,20자 => ^[^ .]{3,20}$ -->
 <div class="container">
-	<form action="/member/write.do" method="post" enctype="multipart/form-data">
+	<form action="/member/update.do" method="post">
 	  <div class="form-group">
 	    <label for="id">아이디</label>
-	    <input type="text" class="form-control" maxlength="20"
-	    	pattern="^[a-zA-Z][a-zA-Z0-9]{2,19}$" required
-	    	placeholder="맨앞글자는 영문자 뒤에는 영문자 또는 숫자 입력, 3~20자"
-	    	id="id" name="id">
-	  </div>
-	  <div id="checkIdDiv" class="alert alert-danger">
-	    아이디는 필수 입력입니다. 3글자에서 20자까지 사용합니다.
+	    <input type="text" class="form-control" readonly
+	     name="id" value="${vo.id }">
 	  </div>
 	  <div class="form-group">
-	    <label for="pw">비밀번호</label>
-	    <input type="password" class="form-control"
-	    	maxlength="20" required
-	    	pattern="^.{3,20}$"
-	    	placeholder="비밀번호 입력" id="pw" name="pw">
-	  </div>
-	  <div id="pwDiv" class="alert alert-danger">
-	    비밀번호는 필수 입력입니다. 3글자에서 20자까지 사용합니다.
-	  </div>
-	  <div class="form-group">
-	    <label for="pw2">비밀번호확인</label>
-	    <input type="password" class="form-control"
-	    	maxlength="20" required
-	    	pattern="^.{3,20}$"
-	    	placeholder="비밀번호 입력" id="pw2">
-	  </div>
-	  <div id="pw2Div" class="alert alert-danger">
-	    비밀번호확인은 필수 입력입니다. 3글자에서 20자까지 사용합니다.
-	  </div>
-	  <div class="form-group">
-	    <label for="name">이름</label>
+	  	<label for="name">이름</label>
 	    <input type="text" class="form-control" maxlength="10"
-	    	pattern="^[a-zA-Z가-힣]{2,10}$" required
+	    	pattern="^[a-zA-Z가-힝]{2,10}$" required
 	    	placeholder="이름입력"
 	    	title="한글 또는 영문으로 2자이상 10자 이내"
-	    	id="name" name="name">
+	    	id="name" name="name" value="${vo.name }">
 	  </div>
 	  <div class="form-group">
 	  	<label>성별</label>
 	  	<div class="form-check-inline">
 			  <label class="form-check-label">
 			    <input type="radio" class="form-check-input"
-			     name="gender" value="남자" checked>남자
+			     name="gender" value="남자" ${(vo.gender == "남자")?"checked":""}>남자
 			  </label>
 			</div>
 			<div class="form-check-inline">
 			  <label class="form-check-label">
 			    <input type="radio" class="form-check-input"
-			     name="gender" value="여자">여자
+			     name="gender" value="여자" ${(vo.gender == "여자")?"checked":""}>여자
 			  </label>
 			</div>
 	  </div>
 	  <div class="form-group">
 	    <label for="birth">생년월일</label>
 	    <input type="text" class="form-control datepicker" required
-	    	id="birth" name="birth">
+	    	id="birth" name="birth" value="${vo.birth }">
 	  </div>
 	  <div class="form-group">
 	    <label for="tel">연락처</label>
 	    <input type="text" class="form-control"
 	    	placeholder="xxx-xxxx-xxxx"
-	    	id="tel" name="tel">
+	    	id="tel" name="tel" value="${vo.tel }">
 	  </div>
 	  <div class="form-group">
 	    <label for="email">이메일</label>
 	    <input type="email" class="form-control" required
 	    	placeholder="id@도메인"
-	    	id="email" name="email">
+	    	id="email" name="email" value="${vo.email }">
 	  </div>
 	  <div class="form-group">
-	    <label for="photo">사진</label>
-	    <input type="file" class="form-control"
-	    	id="photo" name="photo">
+	    <label for="pw">비밀번호확인</label>
+	    <input type="password" class="form-control"
+	    	maxlength="20" required
+	    	pattern="^.{3,20}$"
+	    	placeholder="비밀번호 입력" id="pw" name="pw">
 	  </div>
-	  <button type="submit" class="btn btn-primary">가입</button>
+	  <div id="pwDiv" class="alert alert-danger">
+	    수정을 위해 비밀번호는 필수 입력입니다. 3글자에서 20자까지 사용합니다.
+	  </div>
+	  <button type="submit" class="btn btn-primary">수정</button>
 	  <button type="reset" class="btn btn-secondary">다시입력</button>
 	  <button type="button" onclick="history.back()" class="btn btn-warning">취소</button>
 	</form>
