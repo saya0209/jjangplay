@@ -98,9 +98,9 @@ $(function(){
   <!-- 버튼 -->
   <div class="row mt-4">
     <div class="col-sm-12">
-      <a href="updateForm.do?no=${param.no }" class="btn btn-primary btn-custom">수정</a>
+      <a href="updateForm.do?no=${param.no }&page=${param.page }&perPageNum=${param.perPageNum}&key=${param.key}&word=${param.word}" class="btn btn-primary btn-custom">수정</a>
       <button class="btn btn-danger btn-custom" id="deleteBtn">삭제</button>
-      <a href="list.do" class="btn btn-success btn-custom">리스트</a>
+      <a href="list.do?page=${param.page }&perPageNum=${param.perPageNum}&key=${param.key}&word=${param.word}" class="btn btn-success btn-custom">리스트</a>
     </div>
   </div>
    

@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>이미지 글보기</title>
+<title>상품 상세 보기</title>
 
 <!-- 2.라이브러리 확인 -->
 <script type="text/javascript">
@@ -28,44 +28,41 @@ $(function(){
 
 </head>
 <body>
-글번호 : ${param.no }<br>
 <div class="container">
-  <h1><i class="fa fa-file-text-o"></i> 이미지 글보기</h1>
+  <h1><i class="fa fa-file-text-o"></i> 상품 상세 보기</h1>
   <div class="card">
 	  <div class="card-header">
-	  	<b>${vo.no }. ${vo.title }</b> 
+	  	<b>상품명 : ${vo.name }</b><br>
+	  	<b>상품번호 : ${vo.gno }</b> 
 	  </div>
 	  <div class="card-body">
 	  	<div class="card">
-			  <img class="card-img-top" src="${vo.fileName }" alt="image">
+			  <img class="card-img-top" src="${vo.imageName }" alt="image">
 			  <div class="card-img-overlay">
 			  	<!-- Button to Open the Modal -->
-			  	<c:if test="${login.id == vo.id }">
-						<button type="button" class="btn btn-primary"
-						 data-toggle="modal" data-target="#imageChangeModal">
-						  이미지변경
-						</button>
-					</c:if>
-					<a href="${vo.fileName }" class="btn btn-success" download>다운로드</a>
+				<button type="button" class="btn btn-primary"
+				 data-toggle="modal" data-target="#imageChangeModal">
+				  이미지변경
+				</button>
 			  </div>
 			  <div class="card-body">
 			    <p class="card-text">
 			    	<pre>${vo.content }</pre>
-					</p>
+			    	</p>
+			    <p>모델No: ${vo.modelNo }</p>
+			    <p>제조사: ${vo.company }</p>
+			    <p>제조일: ${vo.productDate }</p>
+			    <p>작성일: ${vo.writeDate }</p>
+			    <p>배송비: ${vo.delivery_cost }</p>
+
 			  </div>
 			</div>
 		</div>
-	  <div class="card-footer">
-	  	<span class="float-right">${vo.writeDate }</span>
-	  	${vo.name }(${vo.id })
-	  </div>
 	</div>
 	<!-- a tag : 데이터를 클릭하면 href 정보를 가져와서 페이지 이동 -->
-	<c:if test="${!empty login && login.id == vo.id }">
 		<a href="updateForm.do?no=${param.no}&page=${param.page}&perPageNum=${param.perPageNum}&key=${param.ket}&word=${param.word}" 
 		class="btn btn-primary" title="이미지를 제외한 정보만 수정합니다." id="updateBtn" data-toggle="tooltip">수정</a>
-		<a href="delete.do?no=${param.no}&deleteFileName=${vo.fileName}&perPageNum=${param.perPageNum}" class="btn btn-danger" id="deleteBtn">삭제</a>
-	</c:if>
+		<a href="delete.do?no=${param.no}&deleteFileName=${vo.imageName}&perPageNum=${param.perPageNum}" class="btn btn-danger" id="deleteBtn">삭제</a>
 	<a href="list.do?no=${param.no}&page=${param.page}&perPageNum=${param.perPageNum}&key=${param.key}&word=${param.word}" class="btn btn-info">목록</a>
 
 	<!-- The Modal -->
@@ -81,8 +78,8 @@ $(function(){
 	      
 	      <form action="imageChange.do" method="post" enctype="multipart/form-data">
 	      	<!-- 숨겨서 넘겨야 할 데이터 : 이미지번호, 현재화일이름(삭제를 위해서) -->
-	      	<input name="no" value="${vo.no }" type="hidden">
-	      	<input name="deleteFileName" value="${vo.fileName }" type="hidden">
+	      	<input name="gno" value="${vo.gno }" type="hidden">
+	      	<input name="deleteFileName" value="${vo.imageName }" type="hidden">
 					<!-- 페이지 정보도 넘겨줍니다. -->
 					<input name="page" value="${param.page }" type="hidden">
 					<input name="perPageNum" value="${param.perPageNum }" type="hidden">
@@ -91,10 +88,10 @@ $(function(){
 		      <!-- Modal body -->
 		      <div class="modal-body">
 		        <div class="form-group">
-				      <label for="imageFile">첨부이미지</label>
+				      <label for="imagename">첨부이미지</label>
 				      <input type="file" class="form-control"
-				       id="imageFile" required
-				      	name="imageFile">
+				       id="imagename" required
+				      	name="imagename">
 				    </div>
 		      </div>
 				</form>

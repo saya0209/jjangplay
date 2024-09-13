@@ -35,7 +35,7 @@
   </div>
   <div class="card-footer">
   	<pageNav:replayPageNav listURI="view.do"
-  		 pageObject="${replyPageObject}"></pageNav:replayPageNav>
+  		 pageObject="${replyPageObject}" query="&inc=0"></pageNav:replayPageNav>
   </div>
 </div>
 
@@ -57,6 +57,10 @@
           	<input type="hidden" name="no" value="${param.no }">
           	<input type="hidden" name="page" value="${param.page }">
           	<input type="hidden" name="perPageNum" value="${param.perPageNum }">
+          	<!-- 검색어관련 -->
+          	<input type="hidden" name="key" value="${param.key }">
+          	<input type="hidden" name="word" value="${param.word }">
+          	
         <!-- Modal body 시작 -->
         <div class="modal-body">
           
@@ -64,17 +68,17 @@
           <!-- 내용 / 작성자 / 비밀번호 -->
           <div class="form-group" id="contentDiv">
           	<label for="content">내용</label>
-          	<textarea class="form-group" rows="3" id="content"
+          	<textarea class="form-controll" rows="3" id="content"
           	name="content"></textarea>
           </div>
           <div class="form-group" id="writerDiv">
           	<label for="writer">작성자</label>
-          	<input type="text" class="form-gruop"
+          	<input type="text" class="form-controll"
           	id="writer" name="writer">
           </div>
           <div class="form-group" id="pwDiv">
           	<label for="pwr">비밀번호</label>
-          	<input type="password" class="form-gruop"
+          	<input type="password" class="form-controll"
           	id="pwr" name="pw">
           </div>
         </div>

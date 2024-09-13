@@ -12,16 +12,23 @@
         $(function(){
             console.log("jQuery loaded...");
             
-           $("#perPageNum").change(function(){
-        	   $("#searchForm").submit();
-           });
-            
-            // 검색데이터 세팅
-           $("#key").val("${(empty pageObject.key)?'t':pageObject.key}");
-           $("#perPageNum").val("${(empty pageObject.perPageNum)?'10':pageObject.perPageNum}");
-           
-            
+         // 데이터 행을 클릭했을 때 이벤트 처리
+            $(".dataRow").click(function(){
+                // 글번호 수집 (view.do로 이동하기 위해)
+                let no = $(this).find(".no").text();
+                console.log("no = " + no);
+                // 페이지 처리를 위해 page 정보를 같이 넘긴다.
+                location.href = "view.do?no=" + no + "&inc=1&${pageObject.pageQuery}";
+            });
 
+            // 페이지당 표시할 개수 변경 시 폼 제출
+            $("#perPageNum").change(function(){
+                $("#searchForm").submit();
+            });
+            
+            // 검색 키워드와 페이지당 표시할 개수 초기 설정
+            $("#key").val("${(empty pageObject.key) ? 't' : pageObject.key}");
+            $("#perPageNum").val("${(empty pageObject.perPageNum) ? '10' : pageObject.perPageNum}");
         });
     </script>
 </head>
@@ -75,22 +82,24 @@
                 <th>조회수</th>
             </tr>
         </thead>
-        <tbody>
-            <c:forEach items="${list}" var="vo">
-                <tr onclick="location='view.do?no=${vo.no}&inc=1'" class="dataRow">
-                    <td>${vo.no}</td>
-                    <td>${vo.title}</td>
-                    <td>${vo.writer}</td>
-                    <td>${vo.writeDate}</td>
-                    <td>${vo.hit}</td>
-                </tr>
-            </c:forEach>
-            <tr>
-                <td colspan="5">
-                    <a href="writeForm.do"><button class="btn btn-primary">등록</button></a>
-                </td>
-            </tr>
-        </tbody>
+      <tbody>
+    <c:forEach items="${list}" var="vo">
+        <tr class="dataRow">
+            <td class="no">${vo.no}</td>
+            <td>${vo.title}</td>
+            <td>${vo.writer}</td>
+            <td>${vo.writeDate}</td>
+            <td>${vo.hit}</td>
+        </tr>
+    </c:forEach>
+    <tr>
+        <td colspan="5">
+            <a href="writeForm.do?perPageNum=${pageObject.perPageNum}">
+                <button class="btn btn-primary">등록</button>
+            </a>
+        </td>
+    </tr>
+</tbody>
     </table>
     <div>
     	<pageNav:pageNav listURI="list.do" pageObject="${ pageObject}"></pageNav:pageNav>

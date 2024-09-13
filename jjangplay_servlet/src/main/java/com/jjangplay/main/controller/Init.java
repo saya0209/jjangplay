@@ -14,6 +14,10 @@ import com.jjangplay.boardreply.service.BoardReplyDeleteService;
 import com.jjangplay.boardreply.service.BoardReplyListService;
 import com.jjangplay.boardreply.service.BoardReplyUpdateService;
 import com.jjangplay.boardreply.service.BoardReplyWriteService;
+import com.jjangplay.goods.dao.GoodsDAO;
+import com.jjangplay.goods.service.GoodsListService;
+import com.jjangplay.goods.service.GoodsViewService;
+import com.jjangplay.goods.service.GoodsWriteService;
 import com.jjangplay.image.dao.ImageDAO;
 import com.jjangplay.image.service.ImageChangeService;
 import com.jjangplay.image.service.ImageDeleteService;
@@ -152,6 +156,17 @@ public class Init {
 		serviceMap.get("/image/update.do").setDAO(daoMap.get("imageDAO"));
 		serviceMap.get("/image/delete.do").setDAO(daoMap.get("imageDAO"));
 		serviceMap.get("/image/imageChange.do").setDAO(daoMap.get("imageDAO"));
+
+		// dao를 생성
+		daoMap.put("goodsDAO", new GoodsDAO());
+		// 5. 상품관리 service 생성
+		serviceMap.put("/goods/list.do", new GoodsListService());
+		serviceMap.put("/goods/view.do", new GoodsViewService());
+		serviceMap.put("/goods/write.do", new GoodsWriteService());
+		// 조립 dao->service
+		serviceMap.get("/goods/list.do").setDAO(daoMap.get("goodsDAO"));
+		serviceMap.get("/goods/view.do").setDAO(daoMap.get("goodsDAO"));
+		serviceMap.get("/goods/write.do").setDAO(daoMap.get("goodsDAO"));
 	}
 	
 	
