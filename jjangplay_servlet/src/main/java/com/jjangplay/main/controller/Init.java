@@ -15,8 +15,15 @@ import com.jjangplay.boardreply.service.BoardReplyListService;
 import com.jjangplay.boardreply.service.BoardReplyUpdateService;
 import com.jjangplay.boardreply.service.BoardReplyWriteService;
 import com.jjangplay.goods.dao.GoodsDAO;
+import com.jjangplay.goods.service.GoodsDeletePriceService;
+import com.jjangplay.goods.service.GoodsDeleteService;
+import com.jjangplay.goods.service.GoodsImageChangeService;
 import com.jjangplay.goods.service.GoodsListService;
+import com.jjangplay.goods.service.GoodsUpdatePriceService;
+import com.jjangplay.goods.service.GoodsUpdateService;
+import com.jjangplay.goods.service.GoodsViewPriceService;
 import com.jjangplay.goods.service.GoodsViewService;
+import com.jjangplay.goods.service.GoodsWritePriceService;
 import com.jjangplay.goods.service.GoodsWriteService;
 import com.jjangplay.image.dao.ImageDAO;
 import com.jjangplay.image.service.ImageChangeService;
@@ -121,10 +128,10 @@ public class Init {
 		serviceMap.put("/member/write.do", new MemberWriteService());
 		serviceMap.put("/member/update.do", new MemberUpdateService());
 		serviceMap.put("/member/delete.do", new MemberDeleteService());
-		serviceMap.put("/member/changePhoto.do", new MemberChangePhotoService());
 		serviceMap.put("/ajax/checkId.do", new MemberCheckIdService());
 		serviceMap.put("/member/changeGradeNo.do", new MemberChangeGradeNoService());
 		serviceMap.put("/member/changeStatus.do", new MemberChangeStatusService());
+		serviceMap.put("/member/changePhoto.do", new MemberChangePhotoService());
 		serviceMap.put("/member/conUpdate.do", new MemberConUpdateService());
 		// 조립 dao->service
 		serviceMap.get("/member/login.do").setDAO(daoMap.get("memberDAO"));
@@ -133,10 +140,10 @@ public class Init {
 		serviceMap.get("/member/write.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/update.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/delete.do").setDAO(daoMap.get("memberDAO"));
-		serviceMap.get("/member/changePhoto.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/ajax/checkId.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/changeGradeNo.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/changeStatus.do").setDAO(daoMap.get("memberDAO"));
+		serviceMap.get("/member/changePhoto.do").setDAO(daoMap.get("memberDAO"));
 		serviceMap.get("/member/conUpdate.do").setDAO(daoMap.get("memberDAO"));
 		
 		
@@ -156,17 +163,33 @@ public class Init {
 		serviceMap.get("/image/update.do").setDAO(daoMap.get("imageDAO"));
 		serviceMap.get("/image/delete.do").setDAO(daoMap.get("imageDAO"));
 		serviceMap.get("/image/imageChange.do").setDAO(daoMap.get("imageDAO"));
-
-		// dao를 생성
+		
+		
+		// 상품관리
+		// dao생성
 		daoMap.put("goodsDAO", new GoodsDAO());
-		// 5. 상품관리 service 생성
+		// 서비스생성
 		serviceMap.put("/goods/list.do", new GoodsListService());
 		serviceMap.put("/goods/view.do", new GoodsViewService());
+		serviceMap.put("/goods/viewPrice.do", new GoodsViewPriceService());
 		serviceMap.put("/goods/write.do", new GoodsWriteService());
-		// 조립 dao->service
+		serviceMap.put("/goods/writePrice.do", new GoodsWritePriceService());
+		serviceMap.put("/goods/update.do", new GoodsUpdateService());
+		serviceMap.put("/goods/updatePrice.do", new GoodsUpdatePriceService());
+		serviceMap.put("/goods/delete.do", new GoodsDeleteService());
+		serviceMap.put("/goods/deletePrice.do", new GoodsDeletePriceService());
+		serviceMap.put("/goods/imageChange.do", new GoodsImageChangeService());
+		// 조립
 		serviceMap.get("/goods/list.do").setDAO(daoMap.get("goodsDAO"));
 		serviceMap.get("/goods/view.do").setDAO(daoMap.get("goodsDAO"));
+		serviceMap.get("/goods/viewPrice.do").setDAO(daoMap.get("goodsDAO"));
 		serviceMap.get("/goods/write.do").setDAO(daoMap.get("goodsDAO"));
+		serviceMap.get("/goods/writePrice.do").setDAO(daoMap.get("goodsDAO"));
+		serviceMap.get("/goods/update.do").setDAO(daoMap.get("goodsDAO"));
+		serviceMap.get("/goods/updatePrice.do").setDAO(daoMap.get("goodsDAO"));
+		serviceMap.get("/goods/delete.do").setDAO(daoMap.get("goodsDAO"));
+		serviceMap.get("/goods/deletePrice.do").setDAO(daoMap.get("goodsDAO"));
+		serviceMap.get("/goods/imageChange.do").setDAO(daoMap.get("goodsDAO"));
 	}
 	
 	

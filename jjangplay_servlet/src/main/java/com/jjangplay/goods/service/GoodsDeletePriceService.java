@@ -6,7 +6,7 @@ import com.jjangplay.goods.vo.GoodsVO;
 import com.jjangplay.main.dao.DAO;
 import com.jjangplay.main.service.Service;
 
-public class GoodsDeleteService implements Service {
+public class GoodsDeletePriceService implements Service {
 
 private GoodsDAO dao;
 	
@@ -16,9 +16,9 @@ private GoodsDAO dao;
 	}
 	
 	@Override
-	public Integer service(Object obj) throws Exception {
+	public Object service(Object obj) throws Exception {
 		// [GoodsController] -> (Execute) -> GoodsDeleteService -> [GoodsDAO.delete()]
-		return dao.delete((Long)obj);
+		return dao.deletePrice((Long)obj);
 	}
 
 }
